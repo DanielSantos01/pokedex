@@ -11,7 +11,22 @@ import com.facebook.react.shell.MainReactPackage;
 import java.util.Arrays;
 import java.util.ArrayList;
 
-
+// @react-native-community/cameraroll
+import com.reactnativecommunity.cameraroll.CameraRollPackage;
+// @react-native-community/slider
+import com.reactnativecommunity.slider.ReactSliderPackage;
+// @react-native-picker/picker
+import com.reactnativecommunity.picker.RNCPickerPackage;
+// react-native-gesture-handler
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+// react-native-pager-view
+import com.reactnativepagerview.PagerViewPackage;
+// react-native-reanimated
+import com.swmansion.reanimated.ReanimatedPackage;
+// react-native-safe-area-context
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+// react-native-screens
+import com.swmansion.rnscreens.RNScreensPackage;
 
 public class PackageList {
   private Application application;
@@ -56,7 +71,15 @@ public class PackageList {
 
   public ArrayList<ReactPackage> getPackages() {
     return new ArrayList<>(Arrays.<ReactPackage>asList(
-      new MainReactPackage(mConfig)
+      new MainReactPackage(mConfig),
+      new CameraRollPackage(),
+      new ReactSliderPackage(),
+      new RNCPickerPackage(),
+      new RNGestureHandlerPackage(),
+      new PagerViewPackage(),
+      new ReanimatedPackage(),
+      new SafeAreaContextPackage(),
+      new RNScreensPackage()
     ));
   }
 }

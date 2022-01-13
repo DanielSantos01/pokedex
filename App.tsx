@@ -1,11 +1,24 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Provider} from 'react-redux';
+import {QueryClientProvider, QueryClient} from 'react-query';
+import {Provider as AntDedignProvider} from '@ant-design/react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import store from './src/redux';
+import Routes from './src/routes/index.routes';
+
+const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <View style={{backgroundColor: '#ffff', height: '100%'}}>
-      <Text>Running pokedex</Text>
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+        <AntDedignProvider>
+          <QueryClientProvider client={queryClient}>
+            <Routes />
+          </QueryClientProvider>
+        </AntDedignProvider>
+      </NavigationContainer>
+    </Provider>
   );
 };
 
