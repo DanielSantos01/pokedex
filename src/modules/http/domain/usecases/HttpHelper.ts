@@ -1,6 +1,6 @@
 import {IHttpClient} from '../../adapters/HttpClient';
 import {IHttpHelper} from '../../data/usecases/IHttpHelper';
-import {IHttpParams} from '../../data/protocols';
+import {IHttpHelperBodyParams, IHttpParams} from '../../data/protocols';
 
 import {HttpResponse} from '../interfaces';
 
@@ -16,9 +16,12 @@ class HttpHelper implements IHttpHelper {
   }
 
   async post<T>(createParams: IHttpParams): Promise<HttpResponse<T>> {
-    const response: HttpResponse<T> = await this.httpClient.post<T>(
-      createParams,
-    );
+    const {body} = createParams;
+    const newBody = this.parse(body);
+    const response: HttpResponse<T> = await this.httpClient.post<T>({
+      ...createParams,
+      body: newBody,
+    });
     return response;
   }
 
@@ -39,6 +42,15 @@ class HttpHelper implements IHttpHelper {
       deleteParams,
     );
     return response;
+  }
+
+  private parse(valueToParse: IHttpHelperBodyParams): URLSearchParams {
+    const urlencoded: URLSearchParams = new URLSearchParams();
+    const objectKeys: string[] = Object.keys(valueToParse);
+    objectKeys.forEach((key: string) => {
+      urlencoded.append(key, valueToParse[key]);
+    });
+    return urlencoded;
   }
 }
 

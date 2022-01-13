@@ -1,9 +1,16 @@
 import React, {useState, useCallback} from 'react';
+import {useQuery} from 'react-query';
+import {connect, useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 import {Toast} from '@ant-design/react-native';
 
 import {Input, SubmitButton} from '../../components';
-import {useAuth} from '../../hooks/auth';
-import {LOGIN_BACKGROUND_URL, POKEMON_TITLE_URL} from '../../constants';
+import {
+  AUTH_URL,
+  LOGIN_BACKGROUND_URL,
+  POKEMON_TITLE_URL,
+} from '../../constants';
+import {appHttpHelper} from '../../services';
 import {
   Container,
   Image,
@@ -12,13 +19,14 @@ import {
   Title,
   Description,
 } from './styles';
+import {logIn} from '../../redux/user';
 
 const Login: React.FC = () => {
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  const {logIn} = useAuth();
+  const dispatch = useDispatch();
 
   const handleLogin = useCallback((data: string) => {
     setLogin(data);
@@ -27,6 +35,30 @@ const Login: React.FC = () => {
   const handlePassword = useCallback((data: string) => {
     setPassword(data);
   }, []);
+
+  const signIn = useCallback(async () => {
+    setLoading(true);
+    const {statusCode, body} = await appHttpHelper.post<any>({
+      url: AUTH_URL,
+      body: {
+        login,
+        password,
+      },
+    });
+
+    setLoading(false);
+    if (statusCode !== 200 || !body.length) {
+      Toast.info(
+        'Não foi possível realizar o login. Verifique os dados e tente novamente',
+      );
+      return;
+    }
+
+    const {login: userName} = body[0];
+
+    dispatch(logIn({login: userName, isLogged: true}));
+    return body;
+  }, [login, password, dispatch]);
 
   const handleButtonPress = useCallback(async () => {
     if (!login) {
@@ -38,10 +70,9 @@ const Login: React.FC = () => {
       Toast.info('A senha é obrigatória');
       return;
     }
-    setLoading(true);
-    await logIn({login, password});
-    setLoading(false);
-  }, [login, password, logIn]);
+
+    await signIn();
+  }, [login, password, signIn]);
 
   return (
     <Container source={{uri: LOGIN_BACKGROUND_URL}} resizeMode="cover">
@@ -82,4 +113,8 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+const map = state => ({
+  login: state.user.login,
+});
+
+export default connect(map)(Login);

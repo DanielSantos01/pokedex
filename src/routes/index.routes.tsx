@@ -1,22 +1,31 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
+import {connect} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import {RouteProps} from './interfaces';
 import LoginRoutes from './login.routes';
 import {Home} from '../screens';
-import {useAuth} from '../hooks/auth';
 
 const Stack = createNativeStackNavigator();
 
-const Routes: React.FC = () => {
-  const {loggedIn} = useAuth();
+const Routes: React.FC<RouteProps> = ({isLogged, key}) => {
   const {reset} = useNavigation();
-  console.log(loggedIn);
-  if (loggedIn) {
+
+  const resetNavigation = () => {
     reset({
       index: 0,
       routes: [{name: 'App'}],
     });
+  };
+
+  if (isLogged) {
+    if (!key) {
+      AsyncStorage.setItem('@pokedex', `${key}`).then(resetNavigation);
+    } else {
+      resetNavigation();
+    }
   }
 
   return (
@@ -27,4 +36,12 @@ const Routes: React.FC = () => {
   );
 };
 
-export default Routes;
+const map = (state: any) => {
+  const key = AsyncStorage.getItem('@pokedex');
+  return {
+    isLogged: !!key || state.user.isLogged,
+    key,
+  };
+};
+
+export default connect(map)(Routes);
