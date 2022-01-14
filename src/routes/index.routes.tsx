@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect, useCallback} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
 import {connect} from 'react-redux';
@@ -7,10 +8,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RouteProps} from './interfaces';
 import LoginRoutes from './login.routes';
 import {Home} from '../screens';
+import { Alert } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
-const Routes: React.FC<RouteProps> = ({isLogged, key}) => {
+const Routes: React.FC<RouteProps> = ({isLogged}) => {
   const {reset} = useNavigation();
 
   const resetNavigation = () => {
@@ -20,13 +22,22 @@ const Routes: React.FC<RouteProps> = ({isLogged, key}) => {
     });
   };
 
-  if (isLogged) {
-    if (!key) {
-      AsyncStorage.setItem('@pokedex', `${key}`).then(resetNavigation);
-    } else {
+  const checkToken = useCallback(async () => {
+    const token = await AsyncStorage.getItem('@pokedex');
+    if (isLogged && !token) {
+      await AsyncStorage.setItem('@pokedex', 'token_bonitinho');
+      resetNavigation();
+      return;
+    }
+
+    if (token) {
       resetNavigation();
     }
-  }
+  }, [resetNavigation, isLogged]);
+
+  useEffect(() => {
+    // checkToken();
+  }, [checkToken]);
 
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
@@ -37,10 +48,8 @@ const Routes: React.FC<RouteProps> = ({isLogged, key}) => {
 };
 
 const map = (state: any) => {
-  const key = AsyncStorage.getItem('@pokedex');
   return {
-    isLogged: !!key || state.user.isLogged,
-    key,
+    isLogged: state.user.isLogged,
   };
 };
 

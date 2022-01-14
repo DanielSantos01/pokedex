@@ -1,25 +1,11 @@
 import React, {useState, useCallback} from 'react';
-import {useQuery} from 'react-query';
 import {connect, useDispatch} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
 import {Toast} from '@ant-design/react-native';
 
-import {Input, SubmitButton} from '../../components';
-import {
-  AUTH_URL,
-  LOGIN_BACKGROUND_URL,
-  POKEMON_TITLE_URL,
-} from '../../constants';
+import {AUTH_URL} from '../../constants';
 import {appHttpHelper} from '../../services';
-import {
-  Container,
-  Image,
-  InputsContainer,
-  CardContent,
-  Title,
-  Description,
-} from './styles';
 import {logIn} from '../../redux/user';
+import Main from './Main';
 
 const Login: React.FC = () => {
   const [login, setLogin] = useState<string>('');
@@ -75,45 +61,16 @@ const Login: React.FC = () => {
   }, [login, password, signIn]);
 
   return (
-    <Container source={{uri: LOGIN_BACKGROUND_URL}} resizeMode="cover">
-      <Image
-        resizeMode="contain"
-        source={{
-          uri: POKEMON_TITLE_URL,
-        }}
-      />
-
-      <CardContent>
-        <Title>Bem-vindo</Title>
-        <Description>Insira os seus dados para acessar</Description>
-
-        <InputsContainer>
-          <Input
-            placeholder="Insira seu login"
-            label="Login"
-            onTextChange={handleLogin}
-          />
-
-          <Input
-            placeholder="Insira sua senha"
-            label="senha"
-            onTextChange={handlePassword}
-            isPassword
-          />
-        </InputsContainer>
-
-        <SubmitButton
-          label="Login"
-          style={{marginTop: 20}}
-          isLoading={isLoading}
-          onPress={handleButtonPress}
-        />
-      </CardContent>
-    </Container>
+    <Main
+      handleButtonPress={handleButtonPress}
+      handleLogin={handleLogin}
+      handlePassword={handlePassword}
+      isLoading={isLoading}
+    />
   );
 };
 
-const map = state => ({
+const map = (state: any) => ({
   login: state.user.login,
 });
 
