@@ -36,7 +36,7 @@ const Routes: React.FC<RouteProps> = ({isLogged}) => {
   }, [resetNavigation, isLogged]);
 
   useEffect(() => {
-    // checkToken();
+    checkToken();
   }, [checkToken]);
 
   return (
