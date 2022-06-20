@@ -1,2 +1,2 @@
 # pokedex
-pokedex repository
+A mobile app to list some pokemons and its descriptions
